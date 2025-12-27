@@ -3,12 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { siteConfig } from "@/config/site";
+import { useSiteContent } from "@/contexts/SiteContentContext";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Contact() {
+  const { content } = useSiteContent();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -113,7 +114,7 @@ export default function Contact() {
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-base">
-                      {siteConfig.contact.email}
+                      {content.contact.email}
                     </CardDescription>
                   </CardContent>
                 </Card>
@@ -129,7 +130,7 @@ export default function Contact() {
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-base">
-                      {siteConfig.contact.phone}
+                      {content.contact.phone}
                     </CardDescription>
                   </CardContent>
                 </Card>
@@ -145,7 +146,7 @@ export default function Contact() {
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-base">
-                      {siteConfig.contact.address}
+                      {content.contact.address}
                     </CardDescription>
                   </CardContent>
                 </Card>
@@ -161,7 +162,7 @@ export default function Contact() {
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-base">
-                      {siteConfig.contact.hours}
+                      {content.contact.hours}
                     </CardDescription>
                   </CardContent>
                 </Card>

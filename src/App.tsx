@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AdminProvider, useAdmin } from "@/contexts/AdminContext";
+import { SiteContentProvider } from "@/contexts/SiteContentContext";
 import { Layout } from "./components/layout/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -29,32 +30,34 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AdminProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Layout><Home /></Layout>} />
-            <Route path="/about" element={<Layout><About /></Layout>} />
-            <Route path="/services" element={<Layout><Services /></Layout>} />
-            <Route path="/contact" element={<Layout><Contact /></Layout>} />
-            <Route path="/careers" element={<Layout><Careers /></Layout>} />
-            
-            {/* Admin routes */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/admin/content" element={<ProtectedRoute><ContentManager /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute><UserManager /></ProtectedRoute>} />
-            <Route path="/admin/pages" element={<ProtectedRoute><PageManager /></ProtectedRoute>} />
-            <Route path="/admin/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-            <Route path="/admin/contacts" element={<ProtectedRoute><ContactManager /></ProtectedRoute>} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<Layout><NotFound /></Layout>} />
-          </Routes>
-        </BrowserRouter>
-      </AdminProvider>
+      <SiteContentProvider>
+        <AdminProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Layout><Home /></Layout>} />
+              <Route path="/about" element={<Layout><About /></Layout>} />
+              <Route path="/services" element={<Layout><Services /></Layout>} />
+              <Route path="/contact" element={<Layout><Contact /></Layout>} />
+              <Route path="/careers" element={<Layout><Careers /></Layout>} />
+              
+              {/* Admin routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/admin/content" element={<ProtectedRoute><ContentManager /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute><UserManager /></ProtectedRoute>} />
+              <Route path="/admin/pages" element={<ProtectedRoute><PageManager /></ProtectedRoute>} />
+              <Route path="/admin/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+              <Route path="/admin/contacts" element={<ProtectedRoute><ContactManager /></ProtectedRoute>} />
+              
+              {/* Catch-all route */}
+              <Route path="*" element={<Layout><NotFound /></Layout>} />
+            </Routes>
+          </BrowserRouter>
+        </AdminProvider>
+      </SiteContentProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
