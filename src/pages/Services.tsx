@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/config/site";
+import { useSiteContent } from "@/contexts/SiteContentContext";
 import { Wallet, Building2, TrendingUp, Shield, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import servicesBg from "@/assets/services-bg.jpg";
@@ -56,6 +56,8 @@ const serviceDetails = [
 ];
 
 export default function Services() {
+  const { content } = useSiteContent();
+  
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -90,7 +92,7 @@ export default function Services() {
                     </div>
                     <CardTitle className="text-2xl">{service.title}</CardTitle>
                     <CardDescription className="text-base mt-2">
-                      {siteConfig.services.find(s => s.title === service.title)?.description}
+                      {content.services.find(s => s.title === service.title)?.description}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

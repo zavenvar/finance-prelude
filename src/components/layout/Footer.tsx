@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
-import { siteConfig } from "@/config/site";
+import { useSiteContent } from "@/contexts/SiteContentContext";
 
 export const Footer = () => {
+  const { content } = useSiteContent();
+  
   return (
     <footer className="border-t border-border bg-muted/50">
       <div className="container mx-auto px-4 py-12">
@@ -10,10 +12,10 @@ export const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="h-8 w-8 rounded bg-primary" />
-              <span className="font-bold text-lg">{siteConfig.name}</span>
+              <span className="font-bold text-lg">{content.name}</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              {siteConfig.footer.tagline}
+              {content.footer.tagline}
             </p>
           </div>
 
@@ -21,7 +23,7 @@ export const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
             <ul className="space-y-2">
-              {siteConfig.footer.links.company.map((link) => (
+              {content.footer.links.company.map((link) => (
                 <li key={link.href}>
                   <Link
                     to={link.href}
@@ -38,7 +40,7 @@ export const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Services</h3>
             <ul className="space-y-2">
-              {siteConfig.footer.links.services.map((link) => (
+              {content.footer.links.services.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.href}
@@ -55,7 +57,7 @@ export const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Legal</h3>
             <ul className="space-y-2">
-              {siteConfig.footer.links.legal.map((link) => (
+              {content.footer.links.legal.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
@@ -72,7 +74,7 @@ export const Footer = () => {
         {/* Copyright */}
         <div className="mt-8 pt-8 border-t border-border">
           <p className="text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+            © {new Date().getFullYear()} {content.name}. All rights reserved.
           </p>
         </div>
       </div>

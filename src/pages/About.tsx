@@ -1,7 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { siteConfig } from "@/config/site";
+import { useSiteContent } from "@/contexts/SiteContentContext";
 
 export default function About() {
+  const { content } = useSiteContent();
+  
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -9,10 +11,10 @@ export default function About() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              {siteConfig.about.title}
+              {content.about.title}
             </h1>
             <p className="text-xl opacity-90">
-              {siteConfig.about.mission}
+              {content.about.mission}
             </p>
           </div>
         </div>
@@ -29,7 +31,7 @@ export default function About() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {siteConfig.about.values.map((value) => (
+            {content.about.values.map((value) => (
               <Card key={value.title} className="text-center border-border">
                 <CardHeader>
                   <CardTitle className="text-2xl">{value.title}</CardTitle>
@@ -52,7 +54,7 @@ export default function About() {
             <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">Our Story</h2>
             <div className="prose prose-lg max-w-none">
               <p className="text-lg text-muted-foreground mb-6">
-                Founded with a vision to revolutionize financial services, {siteConfig.name} has 
+                Founded with a vision to revolutionize financial services, {content.name} has 
                 grown into a trusted partner for individuals and businesses seeking comprehensive 
                 financial solutions.
               </p>

@@ -1,12 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { siteConfig } from "@/config/site";
+import { useSiteContent } from "@/contexts/SiteContentContext";
 import { Button } from "@/components/ui/button";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { content } = useSiteContent();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -17,12 +18,12 @@ export const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded bg-primary" />
-            <span className="font-bold text-xl text-foreground">{siteConfig.name}</span>
+            <span className="font-bold text-xl text-foreground">{content.name}</span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            {siteConfig.nav.map((item) => (
+            {content.nav.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
@@ -56,7 +57,7 @@ export const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <nav className="flex flex-col space-y-4">
-              {siteConfig.nav.map((item) => (
+              {content.nav.map((item) => (
                 <Link
                   key={item.href}
                   to={item.href}

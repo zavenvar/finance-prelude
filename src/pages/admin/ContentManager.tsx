@@ -1,26 +1,22 @@
-import { useState, useEffect } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { siteConfig } from "@/config/site";
+import { useSiteContent } from "@/contexts/SiteContentContext";
 import { toast } from "sonner";
 
 const ContentManager = () => {
-  const [content, setContent] = useState(siteConfig);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("siteContent");
-    if (saved) {
-      setContent(JSON.parse(saved));
-    }
-  }, []);
+  const { content, updateContent } = useSiteContent();
 
   const handleSave = () => {
-    localStorage.setItem("siteContent", JSON.stringify(content));
+    updateContent(content);
     toast.success("Content saved successfully!");
+  };
+
+  const setContent = (newContent: typeof content) => {
+    updateContent(newContent);
   };
 
   return (
