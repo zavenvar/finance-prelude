@@ -9,8 +9,17 @@ export interface DynamicPage {
   status: "Published" | "Draft";
 }
 
+export interface StaticPageOverride {
+  id: string;
+  name: string;
+  path: string;
+  content: string;
+  status: "Published" | "Draft";
+}
+
 type SiteContent = typeof siteConfig & {
   dynamicPages: DynamicPage[];
+  staticPageOverrides: Record<string, StaticPageOverride>;
 };
 
 interface SiteContentContextType {
@@ -21,11 +30,13 @@ interface SiteContentContextType {
 const SiteContentContext = createContext<SiteContentContextType | undefined>(undefined);
 
 const defaultDynamicPages: DynamicPage[] = [];
+const defaultStaticPageOverrides: Record<string, StaticPageOverride> = {};
 
 export const SiteContentProvider = ({ children }: { children: ReactNode }) => {
   const [content, setContent] = useState<SiteContent>({
     ...siteConfig,
     dynamicPages: defaultDynamicPages,
+    staticPageOverrides: defaultStaticPageOverrides,
   });
 
   useEffect(() => {
@@ -36,6 +47,7 @@ export const SiteContentProvider = ({ children }: { children: ReactNode }) => {
         ...siteConfig,
         ...parsed,
         dynamicPages: parsed.dynamicPages || defaultDynamicPages,
+        staticPageOverrides: parsed.staticPageOverrides || defaultStaticPageOverrides,
       });
     }
   }, []);

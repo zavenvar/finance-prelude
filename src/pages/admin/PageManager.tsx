@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,25 +7,32 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useSiteContent, DynamicPage } from "@/contexts/SiteContentContext";
+import { useSiteContent, DynamicPage, StaticPageOverride } from "@/contexts/SiteContentContext";
 
-const staticPages = [
-  { id: "home", name: "Home", path: "/", isStatic: true },
-  { id: "about", name: "About", path: "/about", isStatic: true },
-  { id: "services", name: "Services", path: "/services", isStatic: true },
-  { id: "contact", name: "Contact", path: "/contact", isStatic: true },
-  { id: "careers", name: "Careers", path: "/careers", isStatic: true },
+const defaultStaticPages = [
+  { id: "home", name: "Home", path: "/", content: "Welcome to our company" },
+  { id: "about", name: "About", path: "/about", content: "Learn more about us" },
+  { id: "services", name: "Services", path: "/services", content: "Our services" },
+  { id: "contact", name: "Contact", path: "/contact", content: "Get in touch with us" },
+  { id: "careers", name: "Careers", path: "/careers", content: "Join our team" },
 ];
 
 const PageManager = () => {
   const { content, updateContent } = useSiteContent();
   const [newPage, setNewPage] = useState({ name: "", path: "", content: "" });
-  const [editingPage, setEditingPage] = useState<DynamicPage | null>(null);
+  const [editingPage, setEditingPage] = useState<DynamicPage | StaticPageOverride | null>(null);
+  const [editingType, setEditingType] = useState<"static" | "dynamic">("dynamic");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const dynamicPages = content.dynamicPages || [];
+  const staticPageOverrides = content.staticPageOverrides || {};
+
+  const getStaticPageData = (page: typeof defaultStaticPages[0]) => {
+    const override = staticPageOverrides[page.id];
+    return override || { ...page, status: "Published" as const };
+  };
 
   const handleAddPage = () => {
     if (!newPage.name || !newPage.path) {
@@ -35,8 +42,7 @@ const PageManager = () => {
 
     const pathWithSlash = newPage.path.startsWith("/") ? newPage.path : `/${newPage.path}`;
     
-    // Check for duplicate paths
-    const allPaths = [...staticPages.map(p => p.path), ...dynamicPages.map(p => p.path)];
+    const allPaths = [...defaultStaticPages.map(p => p.path), ...dynamicPages.map(p => p.path)];
     if (allPaths.includes(pathWithSlash)) {
       toast.error("A page with this path already exists");
       return;
@@ -61,7 +67,39 @@ const PageManager = () => {
     toast.success("Page created and added to navigation!");
   };
 
-  const toggleStatus = (id: string) => {
+  const toggleStaticStatus = (pageId: string) => {
+    const defaultPage = defaultStaticPages.find(p => p.id === pageId);
+    if (!defaultPage) return;
+
+    const currentData = getStaticPageData(defaultPage);
+    const newStatus = currentData.status === "Published" ? "Draft" : "Published";
+
+    const updatedOverrides = {
+      ...staticPageOverrides,
+      [pageId]: {
+        ...currentData,
+        status: newStatus as "Published" | "Draft",
+      },
+    };
+
+    let updatedNav = content.nav;
+    if (newStatus === "Published") {
+      if (!updatedNav.find(n => n.href === defaultPage.path)) {
+        updatedNav = [...updatedNav, { name: currentData.name, href: defaultPage.path }];
+      }
+    } else {
+      updatedNav = updatedNav.filter(n => n.href !== defaultPage.path);
+    }
+
+    updateContent({
+      ...content,
+      staticPageOverrides: updatedOverrides,
+      nav: updatedNav,
+    });
+    toast.success(`${defaultPage.name} ${newStatus === "Published" ? "published" : "unpublished"}!`);
+  };
+
+  const toggleDynamicStatus = (id: string) => {
     const updatedPages = dynamicPages.map(page =>
       page.id === id
         ? { ...page, status: page.status === "Published" ? "Draft" as const : "Published" as const }
@@ -73,12 +111,10 @@ const PageManager = () => {
 
     if (page) {
       if (page.status === "Published") {
-        // Add to nav if not exists
         if (!updatedNav.find(n => n.href === page.path)) {
           updatedNav = [...updatedNav, { name: page.name, href: page.path }];
         }
       } else {
-        // Remove from nav
         updatedNav = updatedNav.filter(n => n.href !== page.path);
       }
     }
@@ -108,28 +144,55 @@ const PageManager = () => {
     toast.success("Page deleted!");
   };
 
-  const handleEditPage = (page: DynamicPage) => {
+  const handleEditStaticPage = (pageId: string) => {
+    const defaultPage = defaultStaticPages.find(p => p.id === pageId);
+    if (!defaultPage) return;
+    
+    const pageData = getStaticPageData(defaultPage);
+    setEditingPage(pageData);
+    setEditingType("static");
+    setIsDialogOpen(true);
+  };
+
+  const handleEditDynamicPage = (page: DynamicPage) => {
     setEditingPage(page);
+    setEditingType("dynamic");
     setIsDialogOpen(true);
   };
 
   const handleSaveEdit = () => {
     if (!editingPage) return;
 
-    const updatedPages = dynamicPages.map(page =>
-      page.id === editingPage.id ? editingPage : page
-    );
+    if (editingType === "static") {
+      const updatedOverrides = {
+        ...staticPageOverrides,
+        [editingPage.id]: editingPage as StaticPageOverride,
+      };
 
-    // Update nav if name changed
-    const updatedNav = content.nav.map(n =>
-      n.href === editingPage.path ? { ...n, name: editingPage.name } : n
-    );
+      const updatedNav = content.nav.map(n =>
+        n.href === editingPage.path ? { ...n, name: editingPage.name } : n
+      );
 
-    updateContent({
-      ...content,
-      dynamicPages: updatedPages,
-      nav: updatedNav,
-    });
+      updateContent({
+        ...content,
+        staticPageOverrides: updatedOverrides,
+        nav: updatedNav,
+      });
+    } else {
+      const updatedPages = dynamicPages.map(page =>
+        page.id === editingPage.id ? editingPage as DynamicPage : page
+      );
+
+      const updatedNav = content.nav.map(n =>
+        n.href === editingPage.path ? { ...n, name: editingPage.name } : n
+      );
+
+      updateContent({
+        ...content,
+        dynamicPages: updatedPages,
+        nav: updatedNav,
+      });
+    }
 
     setIsDialogOpen(false);
     setEditingPage(null);
@@ -188,18 +251,40 @@ const PageManager = () => {
                   <TableHead>Name</TableHead>
                   <TableHead>Path</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {staticPages.map((page) => (
-                  <TableRow key={page.id}>
-                    <TableCell>{page.name}</TableCell>
-                    <TableCell>{page.path}</TableCell>
-                    <TableCell>
-                      <Badge>Published</Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {defaultStaticPages.map((page) => {
+                  const pageData = getStaticPageData(page);
+                  return (
+                    <TableRow key={page.id}>
+                      <TableCell>{pageData.name}</TableCell>
+                      <TableCell>{page.path}</TableCell>
+                      <TableCell>
+                        <Badge variant={pageData.status === "Published" ? "default" : "secondary"}>
+                          {pageData.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditStaticPage(page.id)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => toggleStaticStatus(page.id)}
+                        >
+                          {pageData.status === "Published" ? "Unpublish" : "Publish"}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>
@@ -238,14 +323,14 @@ const PageManager = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleEditPage(page)}
+                          onClick={() => handleEditDynamicPage(page)}
                         >
                           Edit
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => toggleStatus(page.id)}
+                          onClick={() => toggleDynamicStatus(page.id)}
                         >
                           {page.status === "Published" ? "Unpublish" : "Publish"}
                         </Button>
