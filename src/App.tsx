@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import Careers from "./pages/Careers";
+import DynamicPage from "./pages/DynamicPage";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
 import Dashboard from "./pages/admin/Dashboard";
@@ -43,6 +44,9 @@ const App = () => (
               <Route path="/contact" element={<Layout><Contact /></Layout>} />
               <Route path="/careers" element={<Layout><Careers /></Layout>} />
               
+              {/* Dynamic pages */}
+              <Route path="/:slug" element={<Layout><DynamicPage /></Layout>} />
+              
               {/* Admin routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -53,7 +57,7 @@ const App = () => (
               <Route path="/admin/contacts" element={<ProtectedRoute><ContactManager /></ProtectedRoute>} />
               
               {/* Catch-all route */}
-              <Route path="*" element={<Layout><NotFound /></Layout>} />
+              <Route path="/404" element={<Layout><NotFound /></Layout>} />
             </Routes>
           </BrowserRouter>
         </AdminProvider>

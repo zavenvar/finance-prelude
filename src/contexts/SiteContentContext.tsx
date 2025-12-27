@@ -1,7 +1,17 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { siteConfig } from "@/config/site";
 
-type SiteContent = typeof siteConfig;
+export interface DynamicPage {
+  id: string;
+  name: string;
+  path: string;
+  content: string;
+  status: "Published" | "Draft";
+}
+
+type SiteContent = typeof siteConfig & {
+  dynamicPages: DynamicPage[];
+};
 
 interface SiteContentContextType {
   content: SiteContent;
@@ -10,13 +20,23 @@ interface SiteContentContextType {
 
 const SiteContentContext = createContext<SiteContentContextType | undefined>(undefined);
 
+const defaultDynamicPages: DynamicPage[] = [];
+
 export const SiteContentProvider = ({ children }: { children: ReactNode }) => {
-  const [content, setContent] = useState<SiteContent>(siteConfig);
+  const [content, setContent] = useState<SiteContent>({
+    ...siteConfig,
+    dynamicPages: defaultDynamicPages,
+  });
 
   useEffect(() => {
     const saved = localStorage.getItem("siteContent");
     if (saved) {
-      setContent(JSON.parse(saved));
+      const parsed = JSON.parse(saved);
+      setContent({
+        ...siteConfig,
+        ...parsed,
+        dynamicPages: parsed.dynamicPages || defaultDynamicPages,
+      });
     }
   }, []);
 
