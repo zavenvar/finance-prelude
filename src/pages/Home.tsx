@@ -47,9 +47,9 @@ export default function Home() {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Services</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{content.home?.servicesSection?.title || "Our Services"}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive financial solutions designed to meet your unique needs
+              {content.home?.servicesSection?.subtitle || "Comprehensive financial solutions designed to meet your unique needs"}
             </p>
           </div>
 
@@ -88,13 +88,13 @@ export default function Home() {
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Get Started?
+            {content.home?.ctaSection?.title || "Ready to Get Started?"}
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Contact us today to discuss how we can help you achieve your financial goals
+            {content.home?.ctaSection?.subtitle || "Contact us today to discuss how we can help you achieve your financial goals"}
           </p>
           <Button variant="hero" size="lg" asChild>
-            <Link to="/contact">Contact Us Today</Link>
+            <Link to="/contact">{content.home?.ctaSection?.buttonText || "Contact Us Today"}</Link>
           </Button>
         </div>
       </section>

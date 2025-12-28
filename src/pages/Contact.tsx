@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useSiteContent } from "@/contexts/SiteContentContext";
-import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,15 +16,54 @@ export default function Contact() {
     phone: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message sent!",
-      description: "We'll get back to you as soon as possible.",
-    });
-    setFormData({ name: "", email: "", phone: "", message: "" });
+    setIsSubmitting(true);
+    
+    try {
+      // Get MySQL API URL from content or environment
+      const mysqlApiUrl = content.mysqlApiUrl;
+      
+      if (!mysqlApiUrl) {
+        throw new Error("MySQL API URL not configured");
+      }
+
+      const response = await fetch(mysqlApiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || null,
+          message: formData.message,
+          submitted_at: new Date().toISOString(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit message");
+      }
+
+      toast({
+        title: "Message sent!",
+        description: "We'll get back to you as soon as possible.",
+      });
+      setFormData({ name: "", email: "", phone: "", message: "" });
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -34,10 +73,10 @@ export default function Contact() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Contact Us
+              {content.contactPage?.hero?.title || "Contact Us"}
             </h1>
             <p className="text-xl opacity-90">
-              Get in touch with our team. We're here to help you with your financial needs.
+              {content.contactPage?.hero?.subtitle || "Get in touch with our team. We're here to help you with your financial needs."}
             </p>
           </div>
         </div>
@@ -49,7 +88,9 @@ export default function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {/* Contact Form */}
             <div>
-              <h2 className="text-3xl font-bold mb-6">Send us a Message</h2>
+              <h2 className="text-3xl font-bold mb-6">
+                {content.contactPage?.formSection?.title || "Send us a Message"}
+              </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <Label htmlFor="name">Name</Label>
@@ -93,15 +134,17 @@ export default function Contact() {
                     className="mt-1"
                   />
                 </div>
-                <Button type="submit" size="lg" className="w-full">
-                  Send Message
+                <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </Button>
               </form>
             </div>
 
             {/* Contact Information */}
             <div>
-              <h2 className="text-3xl font-bold mb-6">Contact Information</h2>
+              <h2 className="text-3xl font-bold mb-6">
+                {content.contactPage?.infoSection?.title || "Contact Information"}
+              </h2>
               <div className="space-y-6">
                 <Card className="border-border">
                   <CardHeader>

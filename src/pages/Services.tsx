@@ -12,51 +12,51 @@ const iconMap = {
   Shield,
 };
 
-const serviceDetails = [
-  {
-    title: "Personal Banking",
-    icon: "Wallet",
-    features: [
-      "Checking & Savings Accounts",
-      "Personal Loans & Mortgages",
-      "Credit & Debit Cards",
-      "Online & Mobile Banking",
-    ],
-  },
-  {
-    title: "Business Solutions",
-    icon: "Building2",
-    features: [
-      "Business Checking & Savings",
-      "Commercial Lending",
-      "Merchant Services",
-      "Cash Management",
-    ],
-  },
-  {
-    title: "Investment Management",
-    icon: "TrendingUp",
-    features: [
-      "Portfolio Management",
-      "Retirement Planning",
-      "Asset Allocation",
-      "Market Analysis",
-    ],
-  },
-  {
-    title: "Wealth Advisory",
-    icon: "Shield",
-    features: [
-      "Estate Planning",
-      "Tax Optimization",
-      "Risk Management",
-      "Legacy Planning",
-    ],
-  },
-];
-
 export default function Services() {
   const { content } = useSiteContent();
+
+  const serviceDetails = content.servicesPage?.serviceDetails || [
+    {
+      title: "Personal Banking",
+      icon: "Wallet",
+      features: [
+        "Checking & Savings Accounts",
+        "Personal Loans & Mortgages",
+        "Credit & Debit Cards",
+        "Online & Mobile Banking",
+      ],
+    },
+    {
+      title: "Business Solutions",
+      icon: "Building2",
+      features: [
+        "Business Checking & Savings",
+        "Commercial Lending",
+        "Merchant Services",
+        "Cash Management",
+      ],
+    },
+    {
+      title: "Investment Management",
+      icon: "TrendingUp",
+      features: [
+        "Portfolio Management",
+        "Retirement Planning",
+        "Asset Allocation",
+        "Market Analysis",
+      ],
+    },
+    {
+      title: "Wealth Advisory",
+      icon: "Shield",
+      features: [
+        "Estate Planning",
+        "Tax Optimization",
+        "Risk Management",
+        "Legacy Planning",
+      ],
+    },
+  ];
   
   return (
     <div className="flex flex-col">
@@ -69,10 +69,10 @@ export default function Services() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center text-primary-foreground">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Our Services
+              {content.servicesPage?.hero?.title || "Our Services"}
             </h1>
             <p className="text-xl opacity-90">
-              Comprehensive financial solutions tailored to your needs
+              {content.servicesPage?.hero?.subtitle || "Comprehensive financial solutions tailored to your needs"}
             </p>
           </div>
         </div>
@@ -116,14 +116,14 @@ export default function Services() {
       <section className="py-20 bg-muted/50">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Interested in Our Services?
+            {content.servicesPage?.ctaSection?.title || "Interested in Our Services?"}
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Get in touch with our team to learn more about how we can help you
+            {content.servicesPage?.ctaSection?.subtitle || "Get in touch with our team to learn more about how we can help you"}
           </p>
           <Button size="lg" asChild>
             <Link to="/contact">
-              Contact Us <ArrowRight className="ml-2 w-4 h-4" />
+              {content.servicesPage?.ctaSection?.buttonText || "Contact Us"} <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </Button>
         </div>
