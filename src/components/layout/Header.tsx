@@ -38,11 +38,6 @@ export const Header = () => {
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Button size="sm">Contact Us</Button>
-          </div>
-
           {/* Mobile Menu Button */}
           <button
             className="md:hidden text-foreground"
@@ -71,7 +66,6 @@ export const Header = () => {
                   {item.name}
                 </Link>
               ))}
-              <Button size="sm" className="w-full">Contact Us</Button>
             </nav>
           </div>
         )}
