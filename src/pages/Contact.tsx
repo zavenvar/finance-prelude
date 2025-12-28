@@ -107,38 +107,6 @@ export default function Contact() {
                   <CardHeader>
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Mail className="w-5 h-5 text-primary" />
-                      </div>
-                      <CardTitle className="text-lg">Email</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base">
-                      {content.contact.email}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-border">
-                  <CardHeader>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Phone className="w-5 h-5 text-primary" />
-                      </div>
-                      <CardTitle className="text-lg">Phone</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base">
-                      {content.contact.phone}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-border">
-                  <CardHeader>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                         <MapPin className="w-5 h-5 text-primary" />
                       </div>
                       <CardTitle className="text-lg">Address</CardTitle>
@@ -147,22 +115,6 @@ export default function Contact() {
                   <CardContent>
                     <CardDescription className="text-base">
                       {content.contact.address}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-border">
-                  <CardHeader>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Clock className="w-5 h-5 text-primary" />
-                      </div>
-                      <CardTitle className="text-lg">Hours</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base">
-                      {content.contact.hours}
                     </CardDescription>
                   </CardContent>
                 </Card>
