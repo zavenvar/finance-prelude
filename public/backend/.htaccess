@@ -1,0 +1,23 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Handle API routing
+RewriteRule ^api/auth$ api/auth.php [L,QSA]
+RewriteRule ^api/auth/(.*)$ api/auth.php?action=$1 [L,QSA]
+RewriteRule ^api/content$ api/content.php [L,QSA]
+RewriteRule ^api/contacts$ api/contacts.php [L,QSA]
+RewriteRule ^api/contacts/(.*)$ api/contacts.php?id=$1 [L,QSA]
+RewriteRule ^api/users$ api/users.php [L,QSA]
+RewriteRule ^api/users/(.*)$ api/users.php?id=$1 [L,QSA]
+RewriteRule ^api/pages$ api/pages.php [L,QSA]
+RewriteRule ^api/pages/path/(.*)$ api/pages.php?path=$1 [L,QSA]
+RewriteRule ^api/pages/(.*)$ api/pages.php?id=$1 [L,QSA]
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect config file
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
