@@ -7,6 +7,7 @@ import { useSiteContent } from "@/contexts/SiteContentContext";
 import { MapPin } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { contactsApi } from "@/lib/api";
 
 export default function Contact() {
   const { content } = useSiteContent();
@@ -24,30 +25,12 @@ export default function Contact() {
     setIsSubmitting(true);
     
     try {
-      // Get MySQL API URL from content or environment
-      const mysqlApiUrl = content.mysqlApiUrl;
-      
-      if (!mysqlApiUrl) {
-        throw new Error("MySQL API URL not configured");
-      }
-
-      const response = await fetch(mysqlApiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone || null,
-          message: formData.message,
-          submitted_at: new Date().toISOString(),
-        }),
+      await contactsApi.submit({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        message: formData.message,
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit message");
-      }
 
       toast({
         title: "Message sent!",

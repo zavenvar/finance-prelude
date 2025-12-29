@@ -6,23 +6,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAdmin();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
     
-    if (login(username, password)) {
-      navigate("/admin/dashboard");
-    } else {
-      setError("Invalid credentials. Use admin/admin123 for demo.");
+    try {
+      const success = await login(username, password);
+      if (success) {
+        navigate("/admin/dashboard");
+      } else {
+        setError("Invalid credentials. Please try again.");
+      }
+    } catch {
+      setError("Login failed. Please check your backend connection.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -34,15 +42,6 @@ const AdminLogin = () => {
           <CardDescription>Enter your credentials to access the admin panel</CardDescription>
         </CardHeader>
         <CardContent>
-          <Alert className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Demo credentials: admin / admin123
-              <br />
-              <strong>WARNING:</strong> This is a temporary client-side solution. Not secure for production.
-            </AlertDescription>
-          </Alert>
-          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
@@ -51,6 +50,7 @@ const AdminLogin = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -62,6 +62,7 @@ const AdminLogin = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -71,8 +72,8 @@ const AdminLogin = () => {
               </Alert>
             )}
             
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </CardContent>

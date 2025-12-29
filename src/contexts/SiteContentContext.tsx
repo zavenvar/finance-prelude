@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { siteConfig } from "@/config/site";
+import { contentApi, SiteContent as ApiSiteContent } from "@/lib/api";
 
 export interface DynamicPage {
   id: string;
@@ -24,7 +25,9 @@ type SiteContent = typeof siteConfig & {
 
 interface SiteContentContextType {
   content: SiteContent;
-  updateContent: (newContent: SiteContent) => void;
+  isLoading: boolean;
+  updateContent: (newContent: SiteContent) => Promise<void>;
+  refreshContent: () => Promise<void>;
 }
 
 const SiteContentContext = createContext<SiteContentContextType | undefined>(undefined);
@@ -38,27 +41,61 @@ export const SiteContentProvider = ({ children }: { children: ReactNode }) => {
     dynamicPages: defaultDynamicPages,
     staticPageOverrides: defaultStaticPageOverrides,
   });
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("siteContent");
-    if (saved) {
-      const parsed = JSON.parse(saved);
+  const fetchContent = async () => {
+    try {
+      const apiContent = await contentApi.get();
+      
+      // Merge API content with default siteConfig
       setContent({
         ...siteConfig,
-        ...parsed,
-        dynamicPages: parsed.dynamicPages || defaultDynamicPages,
-        staticPageOverrides: parsed.staticPageOverrides || defaultStaticPageOverrides,
+        ...apiContent,
+        name: apiContent.name || siteConfig.name,
+        tagline: apiContent.tagline || siteConfig.tagline,
+        description: apiContent.description || siteConfig.description,
+        nav: apiContent.nav || siteConfig.nav,
+        hero: apiContent.hero || siteConfig.hero,
+        home: apiContent.home || siteConfig.home,
+        services: apiContent.services || siteConfig.services,
+        servicesPage: apiContent.servicesPage || siteConfig.servicesPage,
+        about: apiContent.about || siteConfig.about,
+        contact: apiContent.contact || siteConfig.contact,
+        contactPage: apiContent.contactPage || siteConfig.contactPage,
+        careersPage: apiContent.careersPage || siteConfig.careersPage,
+        footer: apiContent.footer || siteConfig.footer,
+        dynamicPages: apiContent.dynamicPages || defaultDynamicPages,
+        staticPageOverrides: apiContent.staticPageOverrides || defaultStaticPageOverrides,
       });
+    } catch (error) {
+      console.error("Failed to fetch content from API, using defaults:", error);
+      // Keep using default siteConfig if API fails
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchContent();
   }, []);
 
-  const updateContent = (newContent: SiteContent) => {
-    setContent(newContent);
-    localStorage.setItem("siteContent", JSON.stringify(newContent));
+  const updateContent = async (newContent: SiteContent) => {
+    try {
+      await contentApi.update(newContent as unknown as ApiSiteContent);
+      setContent(newContent);
+    } catch (error) {
+      console.error("Failed to update content:", error);
+      throw error;
+    }
+  };
+
+  const refreshContent = async () => {
+    setIsLoading(true);
+    await fetchContent();
   };
 
   return (
-    <SiteContentContext.Provider value={{ content, updateContent }}>
+    <SiteContentContext.Provider value={{ content, isLoading, updateContent, refreshContent }}>
       {children}
     </SiteContentContext.Provider>
   );
